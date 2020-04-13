@@ -1,0 +1,21 @@
+{"producer":{"name":"Blender","version":"2.82 (sub 7)","exporter_version":"6.3.1","file":"table_right.babylon"},
+"autoClear":true,"clearColor":[0.0509,0.0509,0.0509],"gravity":[0,-9.81,0],
+"materials":[{"name":"Material","id":"Material","customType":"BABYLON.PBRMaterial","backFaceCulling":true,"checkReadyOnlyOnce":false,"maxSimultaneousLights":4,"environmentIntensity":1,"albedo":[0.0505,0.0378,0.8],"reflectivity":[0.5,0.5,0.5],"roughness":0.4,"alpha":1,"transparencyMode":0,"alphaCutOff":0.4,"metallic":0}],
+"multiMaterials":[],
+"skeletons":[],
+"meshes":[{"name":"table_right","id":"table_right","materialId":"Material","billboardMode":0,"position":[0,0.03,0],"rotation":[0,0,0],"scaling":[0.55,0.05,1.05],"isVisible":true,"freezeWorldMatrix":false,"isEnabled":true,"checkCollisions":false,"receiveShadows":false,"pickable":true,"tags":""
+,"positions":[0.9091,-0.6,-0.9524,0.9091,1,0.9524,0.9091,-0.6,0.9524,0.9091,-0.6,-0.9524,1,1,-1,0.9091,1,-0.9524,1,1,1,1,-1,-1,1,-1,1,0.9091,-0.6,0.9524,1,1,1,1,-1,1,1,1,1,0.9091,1,-0.9524,1,1,-1,0.9091,1,-0.9524,0.9091,-0.6,-0.9524
+,1,-1,-1,1,1,-1,0.9091,-0.6,0.9524,0.9091,1,0.9524,1,1,1,1,1,1,0.9091,1,0.9524,0.9091,1,-0.9524]
+,"normals":[-1,0,0,-1,0,0,-1,0,0,-0.464,0,-0.886,-0.464,0,-0.886,-0.464,0,-0.886,1,0,0,1,0,0,1,0,0,-0.464,0,0.886,-0.464,0,0.886,-0.464,0,0.886,0,1,0,0,1,0,0,1,0,-1,0,0,-0.464,0,-0.886
+,-0.464,0,-0.886,1,0,0,-0.464,0,0.886,-0.464,0,0.886,-0.464,0,0.886,0,1,0,0,1,0,0,1,0]
+,"uvs":[0.375,0.75,0.542,0.5,0.375,0.5,0.375,0.75,0.625,0.75,0.636,0.744,0.625,0.5,0.375,0.75,0.375,0.5,0.375,0.5,0.625,0.5,0.375,0.5,0.625,0.5,0.636,0.744,0.625,0.75,0.542,0.75,0.375,0.75,0.375,0.75,0.625,0.75,0.375,0.5,0.542,0.5,0.625,0.5,0.625,0.5,0.542,0.5,0.636,0.744
+]
+,"indices":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,0,15,1,16,17,4,6,18,7,19,20,21,22,23,24]
+,"subMeshes":[{"materialIndex":0,"verticesStart":0,"verticesCount":25,"indexStart":0,"indexCount":30}]
+,"instances":[]}
+],
+"morphTargetManagers":[],
+"cameras":[],
+"lights":[],
+"shadowGenerators":[]
+}
