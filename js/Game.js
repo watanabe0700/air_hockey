@@ -80,6 +80,7 @@ Game.prototype._initScene = function(engine, _asset) {
     BABYLON.SceneLoader.ImportMesh("mallet", "./babylon_file/", "mallet.babylon", scene, function (newMeshes) {
         _asset[2] = newMeshes[0];
         _initAsset2Position(_asset);
+        _asset[2].physicsImpostor = new BABYLON.PhysicsImpostor(_asset[2], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 10, restitution: 10}, scene);
         document.addEventListener('mousemove', function() {
             // plane world position from mouse screen position
             
@@ -124,12 +125,11 @@ Game.prototype._initScene = function(engine, _asset) {
                 mousePos2.z = -0.05;
             }
             
-            // currently, player's mallet fly
-            _asset[2].physicsImpostor = new BABYLON.PhysicsImpostor(_asset[2], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 1, restitution: 0 }, scene);
-
+            
             _asset[2].position = mousePos2;
 
         }, false);
+        
     });
 
     BABYLON.SceneLoader.ImportMesh("mallet2", "./babylon_file/", "mallet2.babylon", scene, function (newMeshes) {
