@@ -37,52 +37,58 @@ Game.prototype._initScene = function(engine, _asset) {
 
     BABYLON.SceneLoader.ImportMesh("table_bottom", "./babylon_file/", "table_bottom.babylon", scene, function (newMeshes) {
         _asset[4] = newMeshes[0];
-        _asset[4].physicsImpostor = new BABYLON.PhysicsImpostor(_asset[4], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0 }, scene);
+        _asset[4].physicsImpostor = new BABYLON.PhysicsImpostor(_asset[4], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0, friction: 0 }, scene);
     });
 
     BABYLON.SceneLoader.ImportMesh("table_upper_left", "./babylon_file/", "table_upper_left.babylon", scene, function (newMeshes) {
         _asset[5] = newMeshes[0];
-        _asset[5].physicsImpostor = new BABYLON.PhysicsImpostor(_asset[5], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0 }, scene);
+        _asset[5].physicsImpostor = new BABYLON.PhysicsImpostor(_asset[5], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0, friction: 0 }, scene);
     });
 
     BABYLON.SceneLoader.ImportMesh("table_upper_right", "./babylon_file/", "table_upper_right.babylon", scene, function (newMeshes) {
         _asset[6] = newMeshes[0];
-        _asset[6].physicsImpostor = new BABYLON.PhysicsImpostor(_asset[6], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0 }, scene);
+        _asset[6].physicsImpostor = new BABYLON.PhysicsImpostor(_asset[6], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0, friction: 0 }, scene);
     });
 
     BABYLON.SceneLoader.ImportMesh("table_right", "./babylon_file/", "table_right.babylon", scene, function (newMeshes) {
         _asset[7] = newMeshes[0];
-        _asset[7].physicsImpostor = new BABYLON.PhysicsImpostor(_asset[7], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0 }, scene);
+        _asset[7].physicsImpostor = new BABYLON.PhysicsImpostor(_asset[7], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0, friction: 0 }, scene);
     });
 
     BABYLON.SceneLoader.ImportMesh("table_lower_right", "./babylon_file/", "table_lower_right.babylon", scene, function (newMeshes) {
         _asset[8] = newMeshes[0];
-        _asset[8].physicsImpostor = new BABYLON.PhysicsImpostor(_asset[8], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0 }, scene);
+        _asset[8].physicsImpostor = new BABYLON.PhysicsImpostor(_asset[8], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0, friction: 0 }, scene);
     });
 
     BABYLON.SceneLoader.ImportMesh("table_lower_left", "./babylon_file/", "table_lower_left.babylon", scene, function (newMeshes) {
         _asset[9] = newMeshes[0];
-        _asset[9].physicsImpostor = new BABYLON.PhysicsImpostor(_asset[9], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0 }, scene);
+        _asset[9].physicsImpostor = new BABYLON.PhysicsImpostor(_asset[9], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0, friction: 0 }, scene);
     });
 
     BABYLON.SceneLoader.ImportMesh("table_left", "./babylon_file/", "table_left.babylon", scene, function (newMeshes) {
         _asset[10] = newMeshes[0];
-        _asset[10].physicsImpostor = new BABYLON.PhysicsImpostor(_asset[10], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0 }, scene);
+        _asset[10].physicsImpostor = new BABYLON.PhysicsImpostor(_asset[10], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0, friction: 0 }, scene);
     });
 
 
     BABYLON.SceneLoader.ImportMesh("pack", "./babylon_file/", "pack.babylon", scene, function (newMeshes) {
         _asset[1] = newMeshes[0];
-        _asset[1].position = new BABYLON.Vector3(0, 0, 0.5);
-        _asset[1].physicsImpostor = new BABYLON.PhysicsImpostor(_asset[1], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0.1, restitution: 1 }, scene);
+        _asset[1].position = new BABYLON.Vector3(0, 0, -0.5);
+        _asset[1].physicsImpostor = new BABYLON.PhysicsImpostor(_asset[1], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0.1, restitution: 0, friction: 0 }, scene);
+
+        setInterval(function(){
+            _asset[1].rotation = new BABYLON.Vector3(0, 0, 0);
+            _asset[1].position.y = 0;
+        },100);
     });
 
     BABYLON.SceneLoader.ImportMesh("mallet", "./babylon_file/", "mallet.babylon", scene, function (newMeshes) {
         _asset[2] = newMeshes[0];
         _initAsset2Position(_asset);
-        _asset[2].physicsImpostor = new BABYLON.PhysicsImpostor(_asset[2], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 10, restitution: 10}, scene);
+        _asset[2].physicsImpostor = new BABYLON.PhysicsImpostor(_asset[2], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 3, restitution: 0, friction: 10}, scene);
+        var playerPos = new BABYLON.Vector3(0.0, 0.0, -0.95);
         document.addEventListener('mousemove', function() {
-            // plane world position from mouse screen position
+            // マウススクリーン座標をワールド座標に変換し、平面ワールド座標に変換する
             
             var mousePos = BABYLON.Vector3.Unproject(
                 new BABYLON.Vector3(scene.pointerX, scene.pointerY, 0.0),
@@ -112,7 +118,7 @@ Game.prototype._initScene = function(engine, _asset) {
             var ray2 = new BABYLON.Vector3(ray.x * d, ray.y * d, ray.z * d);
             var mousePos2 = new BABYLON.Vector3(mousePos.x + ray2.x, mousePos.y + ray2.y, mousePos.z + ray2.z);
 
-            // set mouse position area
+            // マウス範囲を設定
             if (mousePos2.x < -0.45) {
                 mousePos2.x = -0.45;
             } else if (mousePos2.x > 0.45) {
@@ -121,29 +127,41 @@ Game.prototype._initScene = function(engine, _asset) {
 
             if (mousePos2.z < -0.95) {
                 mousePos2.z = -0.95;
-            } else if(mousePos2.z > -0.05) {
-                mousePos2.z = -0.05;
+            } else if(mousePos2.z > -0.06) {
+                mousePos2.z = -0.06;
             }
             
             
             _asset[2].position = mousePos2;
-
+            playerPos = mousePos2;
+            //_asset[2].rotation = BABYLON.Vector3.RotationFromAxis(0, 0, 0);
         }, false);
         
+        setInterval(function(){
+            _asset[2].position = playerPos;
+        },1);
     });
 
     BABYLON.SceneLoader.ImportMesh("mallet2", "./babylon_file/", "mallet2.babylon", scene, function (newMeshes) {
         _asset[3] = newMeshes[0];
         _initAsset3Position(_asset);
-        // currently, Game AI's mallet pass over the pack
-        _asset[3].physicsImpostor = new BABYLON.PhysicsImpostor(_asset[3], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 3.0, restitution: 1 }, scene);
+        var gameAiPos = new BABYLON.Vector3(0.0, 0.0, 0.95);
+        _asset[3].physicsImpostor = new BABYLON.PhysicsImpostor(_asset[3], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 3, restitution: 0, friction: 10 }, scene);
 
-        // Game AI will grow
         setInterval(function(){
-            if(_asset[3].position.z > 0.05) {
+            _asset[3].position = gameAiPos;
+        },1);
+        
+        // ゲームAI実装部分
+        setInterval(function(){
+            //_asset[3].rotation = BABYLON.Vector3.RotationFromAxis(0, 0, 0);
+            //_asset[3].position.y = 0;
+
+            if(_asset[3].position.z > 0.08) {
                 _asset[3].position.z -= 0.05;
+                gameAiPos = _asset[3].position;
             }
-        },100)
+        },100);
     });
 
     return scene;
