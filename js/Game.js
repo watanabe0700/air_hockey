@@ -152,16 +152,32 @@ Game.prototype._initScene = function(engine, _asset) {
             _asset[3].position = gameAiPos;
         },1);
         
-        // ゲームAI実装部分
-        setInterval(function(){
-            //_asset[3].rotation = BABYLON.Vector3.RotationFromAxis(0, 0, 0);
-            //_asset[3].position.y = 0;
+        var exec_game_ai = false;
 
-            if(_asset[3].position.z > 0.08) {
-                _asset[3].position.z -= 0.05;
-                gameAiPos = _asset[3].position;
+        // ゲームAI実装部分
+        var run_game_ai = setInterval(function(){
+            if (_asset[1] != null && exec_game_ai == false) {
+                if (_asset[1].position.z > 0.08) {
+                    exec_game_ai = true;
+                    clearInterval(run_game_ai);
+
+                    var pack_pnt1 = _asset[1].position;
+                    var pack_pnt2;
+                    setTimeout(function(){
+                        pack_pnt2 = _asset[1].position;
+
+                        // （ほぼ）停止 OR 迫る OR 遠のく
+                        if (Math.abs(pack_pnt2.z - pack_pnt1.z) < 0.001) {
+                            
+                        } else if(pack_pnt2.z > pack_pnt1.z) {
+                            
+                        } else {
+                            
+                        }
+                    }, 200);
+                }
             }
-        },100);
+        },200);
     });
 
     return scene;
@@ -190,3 +206,14 @@ Game.prototype.checkCollisions = function(_this) {
         
     //}
 };
+
+// 2点間の距離を返す
+function distance(pnt1, pnt2) {
+    return Math.sqrt((Math.pow(pnt2.x - pnt1.x, 2) + Math.pow(pnt2.z - pnt1.z, 2)));
+}
+
+// 2点間からの角度を返す
+function pnt2_radian(pnt1, pnt2) {
+    return Math.atan2((pnt2.z - pnt1.z), (pnt2.x - pnt1.x));
+}
+
