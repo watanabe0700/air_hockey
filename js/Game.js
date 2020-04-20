@@ -167,10 +167,40 @@ Game.prototype._initScene = function(engine, _asset) {
                         pack_pnt2 = _asset[1].position;
 
                         // （ほぼ）停止 OR 迫る OR 遠のく
-                        if (Math.abs(pack_pnt2.z - pack_pnt1.z) < 0.001) {
+                        if (distance(pack_pnt1, pack_pnt2) < 0.001) {
                             
                         } else if(pack_pnt2.z > pack_pnt1.z) {
+                            var dig = radian_to_degree(pnt2_radian(pack_pnt1, pack_pnt2));
+                            var dig2 = 180 - dig;
+                            var w_pnt1 = point_distance_degree_to_new_point(pack_pnt2, distance(pack_pnt1, pack_pnt2) * 3, dig);
+                            var new_pnt = new BABYLON.Vector3(0.0, 0.0, 0.0);
+                            if (w_pnt1.x < -0.45 || w_pnt1.x > 0.45) {// 壁に反射する場合
+                                if(w_pnt1.x > 0) {
+                                    var i_pnt = intersection_point(pack_pnt2, w_pnt1, new BABYLON.Vector3(0.5, 0, 0), new BABYLON.Vector3(0.5, 0, 1.0));
+                                    new_pnt = point_distance_degree_to_new_point(i_pnt, distance(pack_pnt1, pack_pnt2) * 3 - distance(pack_pnt2, i_pnt), dig2);
+                                } else {
+                                    var i_pnt = intersection_point(pack_pnt2, w_pnt1, new BABYLON.Vector3(-0.5, 0, 0), new BABYLON.Vector3(-0.5, 0, 1.0));
+                                    new_pnt = point_distance_degree_to_new_point(i_pnt, distance(pack_pnt1, pack_pnt2) * 3 - distance(pack_pnt2, i_pnt), dig2);
+                                }
+                            } else {// 壁に反射しない場合
+                                new_pnt = w_pnt1;
+                            }
+                            new_pnt = game_ai_mallet_point(new_pnt);
                             
+                            // 打点位置までマレットを移動
+                            var move_game_ai_mallet_cnt = 0;
+                            var original_pos = _asset[3].position;
+                            var move_game_ai_mallet = setInterval(function(){
+                                if (move_game_ai_mallet_cnt >= 6){
+                                    clearInterval(move_game_ai_mallet);
+                                } else {
+                                    var new_x = _asset[3].position.x + (new_pnt.x - original_pos.x) * 0.16;
+                                    var new_z = _asset[3].position.z + (new_pnt.z - original_pos.z) * 0.16;
+                                    _asset[3].position = new BABYLON.Vector3(new_x, 0.0, new_z);
+                                    gameAiPos = _asset[3].position;
+                                    move_game_ai_mallet_cnt++;
+                                }
+                            }, 100);
                         } else {
                             
                         }
@@ -212,8 +242,55 @@ function distance(pnt1, pnt2) {
     return Math.sqrt((Math.pow(pnt2.x - pnt1.x, 2) + Math.pow(pnt2.z - pnt1.z, 2)));
 }
 
-// 2点間からの角度を返す
+// 2点間からの角度（ラジアン）を返す
 function pnt2_radian(pnt1, pnt2) {
     return Math.atan2((pnt2.z - pnt1.z), (pnt2.x - pnt1.x));
 }
 
+// ラジアンから度に変換
+function radian_to_degree(rad) {
+    return rad * 180 / Math.PI;
+}
+
+// 度からラジアンに変換
+function degree_to_radian(d) {
+    return d * Math.PI / 180;
+}
+
+// ある座標と距離と角度から座標を求める
+function point_distance_degree_to_new_point(pnt, dis, deg) {
+    var x2 = pnt.x + dis * Math.cos(degree_to_radian(deg));
+    var z2 = pnt.z + dis * Math.sin(degree_to_radian(deg));
+    var new_pnt = new BABYLON.Vector3(x2, 0, z2);
+    return new_pnt;
+}
+
+// ゲームAI側マレットの位置調整
+function game_ai_mallet_point(pnt) {
+    if (pnt.x < -0.45) {
+        pnt.x = -0.45;
+    } else if (pnt.x > 0.45) {
+        pnt.x = 0.45;
+    }
+
+    if (pnt.z > 0.95) {
+        pnt.z = 0.95;
+    } else if(pnt.z < 0.06) {
+        pnt.z = 0.06;
+    }
+
+    return pnt;
+}
+
+// 2直線（4点）から交点を求める
+function intersection_point(p1, p2, p3, p4) {
+    var d0 = (p2.z - p1.z) * (p4.x - p3.x) - (p2.x - p1.x) * (p4.z - p3.z);
+    var d1 = (p3.z * p4.x - p3.x * p4.z);
+    var d2 = (p1.z * p2.x - p1.x * p2.z);
+    
+    var cp = new BABYLON.Vector3(0, 0, 0);
+	cp.x = (d1 * (p2.x - p1.x) - d2 * (p4.x - p3.x)) / d0;
+    cp.z = (d1 * (p2.z - p1.z) - d2 * (p4.z - p3.z)) / d0;
+
+    return cp;
+}
