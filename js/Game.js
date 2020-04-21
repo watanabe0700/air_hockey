@@ -2,6 +2,9 @@ window.addEventListener("DOMContentLoaded", function() {
     new Game("gameCanvas");
 }, false);
 
+var run_game_ai = null;
+var gameAiPos = null;
+
 var Game = function(canvasId) {
     var canvas = document.getElementById(canvasId);
     this.engine = new BABYLON.Engine(canvas, true);
@@ -145,7 +148,7 @@ Game.prototype._initScene = function(engine, _asset) {
     BABYLON.SceneLoader.ImportMesh("mallet2", "./babylon_file/", "mallet2.babylon", scene, function (newMeshes) {
         _asset[3] = newMeshes[0];
         _initAsset3Position(_asset);
-        var gameAiPos = new BABYLON.Vector3(0.0, 0.0, 0.95);
+        gameAiPos = new BABYLON.Vector3(0.0, 0.0, 0.95);
         _asset[3].physicsImpostor = new BABYLON.PhysicsImpostor(_asset[3], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 3, restitution: 0, friction: 10 }, scene);
 
         setInterval(function(){
@@ -154,64 +157,91 @@ Game.prototype._initScene = function(engine, _asset) {
         
         var exec_game_ai = false;
 
-        // ゲームAI実装部分
-        var run_game_ai = setInterval(function(){
-            if (_asset[1] != null && exec_game_ai == false) {
-                if (_asset[1].position.z > 0.08) {
-                    exec_game_ai = true;
-                    clearInterval(run_game_ai);
-
-                    var pack_pnt1 = _asset[1].position;
-                    var pack_pnt2;
-                    setTimeout(function(){
-                        pack_pnt2 = _asset[1].position;
-
-                        // （ほぼ）停止 OR 迫る OR 遠のく
-                        if (distance(pack_pnt1, pack_pnt2) < 0.001) {
-                            
-                        } else if(pack_pnt2.z > pack_pnt1.z) {
-                            var dig = radian_to_degree(pnt2_radian(pack_pnt1, pack_pnt2));
-                            var dig2 = 180 - dig;
-                            var w_pnt1 = point_distance_degree_to_new_point(pack_pnt2, distance(pack_pnt1, pack_pnt2) * 3, dig);
-                            var new_pnt = new BABYLON.Vector3(0.0, 0.0, 0.0);
-                            if (w_pnt1.x < -0.45 || w_pnt1.x > 0.45) {// 壁に反射する場合
-                                if(w_pnt1.x > 0) {
-                                    var i_pnt = intersection_point(pack_pnt2, w_pnt1, new BABYLON.Vector3(0.5, 0, 0), new BABYLON.Vector3(0.5, 0, 1.0));
-                                    new_pnt = point_distance_degree_to_new_point(i_pnt, distance(pack_pnt1, pack_pnt2) * 3 - distance(pack_pnt2, i_pnt), dig2);
-                                } else {
-                                    var i_pnt = intersection_point(pack_pnt2, w_pnt1, new BABYLON.Vector3(-0.5, 0, 0), new BABYLON.Vector3(-0.5, 0, 1.0));
-                                    new_pnt = point_distance_degree_to_new_point(i_pnt, distance(pack_pnt1, pack_pnt2) * 3 - distance(pack_pnt2, i_pnt), dig2);
-                                }
-                            } else {// 壁に反射しない場合
-                                new_pnt = w_pnt1;
-                            }
-                            new_pnt = game_ai_mallet_point(new_pnt);
-                            
-                            // 打点位置までマレットを移動
-                            var move_game_ai_mallet_cnt = 0;
-                            var original_pos = _asset[3].position;
-                            var move_game_ai_mallet = setInterval(function(){
-                                if (move_game_ai_mallet_cnt >= 6){
-                                    clearInterval(move_game_ai_mallet);
-                                } else {
-                                    var new_x = _asset[3].position.x + (new_pnt.x - original_pos.x) * 0.16;
-                                    var new_z = _asset[3].position.z + (new_pnt.z - original_pos.z) * 0.16;
-                                    _asset[3].position = new BABYLON.Vector3(new_x, 0.0, new_z);
-                                    gameAiPos = _asset[3].position;
-                                    move_game_ai_mallet_cnt++;
-                                }
-                            }, 100);
-                        } else {
-                            
-                        }
-                    }, 200);
-                }
-            }
-        },200);
+        // ゲームAI起動
+        run_game_ai = setInterval(game_ai, 200, exec_game_ai, _asset);
     });
 
     return scene;
 };
+
+// ゲームAI実装部分
+function game_ai(exec_game_ai, _asset) {
+    if (_asset[1] != null && exec_game_ai == false) {
+        if (_asset[1].position.z > 0.08) {
+            exec_game_ai = true;
+            clearInterval(run_game_ai);
+
+            var pack_pnt1 = _asset[1].position;
+            var pack_pnt2;
+            
+            setTimeout(function(){
+                pack_pnt2 = _asset[1].position;
+                
+                // （ほぼ）停止 OR 迫る OR 遠ざかる
+                if (distance(pack_pnt1, pack_pnt2) < 0.01) {// （ほぼ）停止
+                    var new_pnt = pack_pnt2;
+                    //new_pnt.z += 0.02;
+                    new_pnt = game_ai_mallet_point(new_pnt);
+
+                    // 打点位置までマレットを移動
+                    var move_game_ai_mallet_cnt = 0;
+                    var original_pos = _asset[3].position;
+                    var move_game_ai_mallet = setInterval(function(){
+                        if (move_game_ai_mallet_cnt >= 6){
+                            clearInterval(move_game_ai_mallet);
+                            exec_game_ai = false;
+                            run_game_ai = setInterval(game_ai, 200, exec_game_ai, _asset);
+                        } else {
+                            var new_x = _asset[3].position.x + (new_pnt.x - original_pos.x) * 0.16;
+                            var new_z = _asset[3].position.z + (new_pnt.z - original_pos.z) * 0.16;
+                            _asset[3].position = new BABYLON.Vector3(new_x, 0.0, new_z);
+                            gameAiPos = _asset[3].position;
+                            move_game_ai_mallet_cnt++;
+                        }
+                    }, 100);
+                } else if(pack_pnt2.z > pack_pnt1.z) {// 迫る
+                    var dig = radian_to_degree(pnt2_radian(pack_pnt1, pack_pnt2));
+                    var dig2 = 180 - dig;
+                    var w_pnt1 = point_distance_degree_to_new_point(pack_pnt2, distance(pack_pnt1, pack_pnt2) * 3, dig);
+                    var new_pnt = new BABYLON.Vector3(0.0, 0.0, 0.0);
+                    if (w_pnt1.x < -0.45 || w_pnt1.x > 0.45) {// 壁に反射する場合
+                        if(w_pnt1.x > 0) {
+                            var i_pnt = intersection_point(pack_pnt2, w_pnt1, new BABYLON.Vector3(0.5, 0, 0), new BABYLON.Vector3(0.5, 0, 1.0));
+                            new_pnt = point_distance_degree_to_new_point(i_pnt, distance(pack_pnt1, pack_pnt2) * 3 - distance(pack_pnt2, i_pnt), dig2);
+                        } else {
+                            var i_pnt = intersection_point(pack_pnt2, w_pnt1, new BABYLON.Vector3(-0.5, 0, 0), new BABYLON.Vector3(-0.5, 0, 1.0));
+                            new_pnt = point_distance_degree_to_new_point(i_pnt, distance(pack_pnt1, pack_pnt2) * 3 - distance(pack_pnt2, i_pnt), dig2);
+                        }
+                    } else {// 壁に反射しない場合
+                        new_pnt = w_pnt1;
+                    }
+                    new_pnt = game_ai_mallet_point(new_pnt);
+                    
+                    // 打点位置までマレットを移動
+                    var move_game_ai_mallet_cnt = 0;
+                    var original_pos = _asset[3].position;
+                    var move_game_ai_mallet = setInterval(function(){
+                        if (move_game_ai_mallet_cnt >= 6){
+                            clearInterval(move_game_ai_mallet);
+                            
+                            exec_game_ai = false;
+                            run_game_ai = setInterval(game_ai, 200, exec_game_ai, _asset);
+                        } else {
+                            var new_x = _asset[3].position.x + (new_pnt.x - original_pos.x) * 0.16;
+                            var new_z = _asset[3].position.z + (new_pnt.z - original_pos.z) * 0.16;
+                            _asset[3].position = new BABYLON.Vector3(new_x, 0.0, new_z);
+                            gameAiPos = _asset[3].position;
+                            move_game_ai_mallet_cnt++;
+                        }
+                    }, 100);
+                } else {// 遠ざかる
+                    exec_game_ai = false;
+                    run_game_ai = setInterval(game_ai, 200, exec_game_ai, _asset);
+                }
+            }, 200);
+        }
+    }
+}
 
 var _initAsset2Position = function(_asset) {
     _asset[2].position = new BABYLON.Vector3(0.0, 0.0, -0.95);
