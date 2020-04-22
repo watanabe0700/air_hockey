@@ -9,24 +9,20 @@ var Game = function(canvasId) {
     var canvas = document.getElementById(canvasId);
     this.engine = new BABYLON.Engine(canvas, true);
     this.engine.enableOfflineSupport = false;
-    this.asset = [null, null, null, null, null, null, null, null, null, null, null];
+    this.asset = [null, null, null, null, null, null, null, null, null, null, null, null, null];
 
-    this.scene = this._initScene(this.engine, this.asset);
+    this.scene = this._initScene(this.engine, this.asset, this);
     
     this._initGame();
 
     var _this = this;
-
-    this.scene.registerBeforeRender(function() {
-        _this.checkCollisions();
-    });
 
     this.engine.runRenderLoop(function () {
         _this.scene.render();
     });
 };
 
-Game.prototype._initScene = function(engine, _asset) {
+Game.prototype._initScene = function(engine, _asset, _this) {
     var scene = new BABYLON.Scene(engine);
     
     var camera = new BABYLON.FreeCamera("camera", new BABYLON.Vector3(0,2.5,-1.5), scene);
@@ -74,6 +70,23 @@ Game.prototype._initScene = function(engine, _asset) {
     });
 
 
+    BABYLON.SceneLoader.ImportMesh("player_lost_point", "./babylon_file/", "player_lost_point.babylon", scene, function (newMeshes) {
+        _asset[11] = newMeshes[0];
+        var material = new BABYLON.StandardMaterial("player_lost_point_Material", scene);
+        material.diffuseColor = new BABYLON.Color3(1,1,1);
+        material.alpha = 0;
+        _asset[11].material = material;
+    });
+
+    BABYLON.SceneLoader.ImportMesh("game_ai_lost_point", "./babylon_file/", "game_ai_lost_point.babylon", scene, function (newMeshes) {
+        _asset[12] = newMeshes[0];
+        var material = new BABYLON.StandardMaterial("game_ai_lost_point_Material", scene);
+        material.diffuseColor = new BABYLON.Color3(1,1,1);
+        material.alpha = 0;
+        _asset[12].material = material;
+    });
+
+
     BABYLON.SceneLoader.ImportMesh("pack", "./babylon_file/", "pack.babylon", scene, function (newMeshes) {
         _asset[1] = newMeshes[0];
         _asset[1].position = new BABYLON.Vector3(0, 0, -0.5);
@@ -82,6 +95,40 @@ Game.prototype._initScene = function(engine, _asset) {
         setInterval(function(){
             _asset[1].rotation = new BABYLON.Vector3(0, 0, 0);
             _asset[1].position.y = 0;
+            if(_asset[11] != null && _asset[12] != null) {
+                if (_asset[1].intersectsMesh(_asset[11], true)) {
+
+                    console.log("Game AI +1");
+                    gameAiScore++;
+
+                    _asset[1].physicsImpostor = null;
+                    _asset[1].physicsImpostor = new BABYLON.PhysicsImpostor(_asset[1], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0.1, restitution: 0, friction: 0 }, scene);
+                    _asset[1].position = new BABYLON.Vector3(0, 0, -0.5);
+                }
+                else if (_asset[1].intersectsMesh(_asset[12], true)) {
+
+                    console.log("Player +1");
+                    playerScore++;
+
+                    _asset[1].physicsImpostor = null;
+                    _asset[1].physicsImpostor = new BABYLON.PhysicsImpostor(_asset[1], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0.1, restitution: 0, friction: 0 }, scene);
+                    _asset[1].position = new BABYLON.Vector3(0, 0, -0.5);
+                }
+            }
+
+            // パックの位置がテーブルの範囲を越えた場合
+            if(!(_asset[1].position.x >= -0.5 && _asset[1].position.x <= 0.5 && _asset[1].position.z >= -1.0 && _asset[1].position.z <= 1.0)) {
+                _asset[1].position = new BABYLON.Vector3(0, 0, -0.5);
+            }
+
+            // パックがゲームAI側で固まった場合
+            var pack1Pos1 = _asset[1].position;
+            setTimeout(function(){
+                var pack1Pos2 = _asset[1].position;
+                if(pack1Pos2.z > 0 && distance(pack1Pos1, pack1Pos2) < 0.005) {
+                    _asset[1].position = new BABYLON.Vector3(0, 0, 0.5);
+                }
+            }, 3000);
         },100);
     });
 
@@ -252,19 +299,12 @@ var _initAsset3Position = function(_asset) {
 
 Game.prototype._initGame = function() {
     this.playerScore = 0;
-    this.comScore = 0;
+    this.gameAiScore = 0;
 
     
 
     
     this.scene.debugLayer.show();
-};
-
-
-Game.prototype.checkCollisions = function(_this) {
-    //if (_this.box.intersectsMesh(_this.otherMesh, true)) {
-        
-    //}
 };
 
 // 2点間の距離を返す
