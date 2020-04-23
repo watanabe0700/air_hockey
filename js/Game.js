@@ -5,6 +5,11 @@ window.addEventListener("DOMContentLoaded", function() {
 var run_game_ai = null;
 var gameAiPos = null;
 
+var playerScore = 0;
+var gameAiScore = 0;
+var scoreboard_texture = null;
+var judgement = false;
+
 var Game = function(canvasId) {
     var canvas = document.getElementById(canvasId);
     this.engine = new BABYLON.Engine(canvas, true);
@@ -18,6 +23,16 @@ var Game = function(canvasId) {
     var _this = this;
 
     this.engine.runRenderLoop(function () {
+        if(judgement == true) {
+            if (playerScore > gameAiScore) {
+                $("#score_div").text("You Win!");
+            } else {
+                $("#score_div").text("You Lose!");
+            }
+        } else {
+            $("#score_div").text("You:" + playerScore + "  Game AI:" + gameAiScore);
+        }
+        
         _this.scene.render();
     });
 };
@@ -117,7 +132,7 @@ Game.prototype._initScene = function(engine, _asset, _this) {
             }
 
             // パックの位置がテーブルの範囲を越えた場合
-            if(!(_asset[1].position.x >= -0.5 && _asset[1].position.x <= 0.5 && _asset[1].position.z >= -1.0 && _asset[1].position.z <= 1.0)) {
+            if(!(_asset[1].position.x >= -0.5 && _asset[1].position.x <= 0.5 && _asset[1].position.z >= -1.0 && _asset[1].position.z <= 1.0 && _asset[1].position.y >= -0.03 && _asset[1].position.y <= 0.03)) {
                 _asset[1].position = new BABYLON.Vector3(0, 0, -0.5);
             }
 
@@ -298,13 +313,8 @@ var _initAsset3Position = function(_asset) {
 };
 
 Game.prototype._initGame = function() {
-    this.playerScore = 0;
-    this.gameAiScore = 0;
-
-    
-
-    
-    this.scene.debugLayer.show();
+    playerScore = 0;
+    gameAiScore = 0;
 };
 
 // 2点間の距離を返す
