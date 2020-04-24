@@ -8,41 +8,41 @@ var gameAiPos = null;
 var playerScore = 0;
 var gameAiScore = 0;
 var scoreboard_texture = null;
-var judgement = false;
+
+var first_flag = true;
+
+asset = [null, null, null, null, null, null, null, null, null, null, null, null, null];
 
 var Game = function(canvasId) {
     var canvas = document.getElementById(canvasId);
     this.engine = new BABYLON.Engine(canvas, true);
     this.engine.enableOfflineSupport = false;
-    this.asset = [null, null, null, null, null, null, null, null, null, null, null, null, null];
 
-    this.scene = this._initScene(this.engine, this.asset, this);
-    
-    this._initGame();
+    this.scene = this._initScene(this.engine, this);
+
+    //ダブルクリックしたら、パックの位置を初期化
+    canvas.addEventListener('dblclick',function(e) {
+        if (asset[1] != null) {
+            asset[1].physicsImpostor = null;
+            asset[1].position = new BABYLON.Vector3(0, 0, -0.5);
+            asset[1].physicsImpostor = new BABYLON.PhysicsImpostor(asset[1], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0.1, restitution: 0, friction: 0 }, this.scene);
+        }
+    });
 
     var _this = this;
 
     this.engine.runRenderLoop(function () {
-        if(judgement == true) {
-            if (playerScore > gameAiScore) {
-                $("#score_div").text("You Win!");
-            } else {
-                $("#score_div").text("You Lose!");
-            }
-        } else {
-            $("#score_div").text("You:" + playerScore + "  Game AI:" + gameAiScore);
-        }
+        $("#score_div").text("You:" + playerScore + "  Game AI:" + gameAiScore);
         
         _this.scene.render();
     });
 };
 
-Game.prototype._initScene = function(engine, _asset, _this) {
+Game.prototype._initScene = function(engine, _this) {
     var scene = new BABYLON.Scene(engine);
     
     var camera = new BABYLON.FreeCamera("camera", new BABYLON.Vector3(0,2.5,-1.5), scene);
     camera.rotation.x = 45;
-    //camera.attachControl(engine.getRenderingCanvas());
 
     var light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0,10,0), scene);
     light.intensity = 0.7;
@@ -50,107 +50,121 @@ Game.prototype._initScene = function(engine, _asset, _this) {
     scene.enablePhysics(new BABYLON.Vector3(0,-9.81,0), new BABYLON.CannonJSPlugin());
 
     BABYLON.SceneLoader.ImportMesh("table_bottom", "./babylon_file/", "table_bottom.babylon", scene, function (newMeshes) {
-        _asset[4] = newMeshes[0];
-        _asset[4].physicsImpostor = new BABYLON.PhysicsImpostor(_asset[4], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0, friction: 0 }, scene);
+        asset[4] = newMeshes[0];
+        asset[4].physicsImpostor = new BABYLON.PhysicsImpostor(asset[4], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0, friction: 0 }, scene);
     });
 
     BABYLON.SceneLoader.ImportMesh("table_upper_left", "./babylon_file/", "table_upper_left.babylon", scene, function (newMeshes) {
-        _asset[5] = newMeshes[0];
-        _asset[5].physicsImpostor = new BABYLON.PhysicsImpostor(_asset[5], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0, friction: 0 }, scene);
+        asset[5] = newMeshes[0];
+        asset[5].physicsImpostor = new BABYLON.PhysicsImpostor(asset[5], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0, friction: 0 }, scene);
     });
 
     BABYLON.SceneLoader.ImportMesh("table_upper_right", "./babylon_file/", "table_upper_right.babylon", scene, function (newMeshes) {
-        _asset[6] = newMeshes[0];
-        _asset[6].physicsImpostor = new BABYLON.PhysicsImpostor(_asset[6], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0, friction: 0 }, scene);
+        asset[6] = newMeshes[0];
+        asset[6].physicsImpostor = new BABYLON.PhysicsImpostor(asset[6], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0, friction: 0 }, scene);
     });
 
     BABYLON.SceneLoader.ImportMesh("table_right", "./babylon_file/", "table_right.babylon", scene, function (newMeshes) {
-        _asset[7] = newMeshes[0];
-        _asset[7].physicsImpostor = new BABYLON.PhysicsImpostor(_asset[7], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0, friction: 0 }, scene);
+        asset[7] = newMeshes[0];
+        asset[7].physicsImpostor = new BABYLON.PhysicsImpostor(asset[7], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0, friction: 0 }, scene);
     });
 
     BABYLON.SceneLoader.ImportMesh("table_lower_right", "./babylon_file/", "table_lower_right.babylon", scene, function (newMeshes) {
-        _asset[8] = newMeshes[0];
-        _asset[8].physicsImpostor = new BABYLON.PhysicsImpostor(_asset[8], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0, friction: 0 }, scene);
+        asset[8] = newMeshes[0];
+        asset[8].physicsImpostor = new BABYLON.PhysicsImpostor(asset[8], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0, friction: 0 }, scene);
     });
 
     BABYLON.SceneLoader.ImportMesh("table_lower_left", "./babylon_file/", "table_lower_left.babylon", scene, function (newMeshes) {
-        _asset[9] = newMeshes[0];
-        _asset[9].physicsImpostor = new BABYLON.PhysicsImpostor(_asset[9], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0, friction: 0 }, scene);
+        asset[9] = newMeshes[0];
+        asset[9].physicsImpostor = new BABYLON.PhysicsImpostor(asset[9], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0, friction: 0 }, scene);
     });
 
     BABYLON.SceneLoader.ImportMesh("table_left", "./babylon_file/", "table_left.babylon", scene, function (newMeshes) {
-        _asset[10] = newMeshes[0];
-        _asset[10].physicsImpostor = new BABYLON.PhysicsImpostor(_asset[10], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0, friction: 0 }, scene);
+        asset[10] = newMeshes[0];
+        asset[10].physicsImpostor = new BABYLON.PhysicsImpostor(asset[10], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0, friction: 0 }, scene);
     });
 
 
     BABYLON.SceneLoader.ImportMesh("player_lost_point", "./babylon_file/", "player_lost_point.babylon", scene, function (newMeshes) {
-        _asset[11] = newMeshes[0];
+        asset[11] = newMeshes[0];
         var material = new BABYLON.StandardMaterial("player_lost_point_Material", scene);
         material.diffuseColor = new BABYLON.Color3(1,1,1);
         material.alpha = 0;
-        _asset[11].material = material;
+        asset[11].material = material;
     });
 
     BABYLON.SceneLoader.ImportMesh("game_ai_lost_point", "./babylon_file/", "game_ai_lost_point.babylon", scene, function (newMeshes) {
-        _asset[12] = newMeshes[0];
+        asset[12] = newMeshes[0];
         var material = new BABYLON.StandardMaterial("game_ai_lost_point_Material", scene);
         material.diffuseColor = new BABYLON.Color3(1,1,1);
         material.alpha = 0;
-        _asset[12].material = material;
+        asset[12].material = material;
     });
 
 
     BABYLON.SceneLoader.ImportMesh("pack", "./babylon_file/", "pack.babylon", scene, function (newMeshes) {
-        _asset[1] = newMeshes[0];
-        _asset[1].position = new BABYLON.Vector3(0, 0, -0.5);
-        _asset[1].physicsImpostor = new BABYLON.PhysicsImpostor(_asset[1], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0.1, restitution: 0, friction: 0 }, scene);
+        asset[1] = newMeshes[0];
+        asset[1].position = new BABYLON.Vector3(0, 0, -0.5);
+        asset[1].physicsImpostor = new BABYLON.PhysicsImpostor(asset[1], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0.1, restitution: 0, friction: 0 }, scene);
 
         setInterval(function(){
-            _asset[1].rotation = new BABYLON.Vector3(0, 0, 0);
-            _asset[1].position.y = 0;
-            if(_asset[11] != null && _asset[12] != null) {
-                if (_asset[1].intersectsMesh(_asset[11], true)) {
+            asset[1].rotation = new BABYLON.Vector3(0, 0, 0);
+            asset[1].position.y = 0;
+            if(asset[11] != null && asset[12] != null) {
+                if (asset[1].intersectsMesh(asset[11], true)) {
 
                     console.log("Game AI +1");
                     gameAiScore++;
 
-                    _asset[1].physicsImpostor = null;
-                    _asset[1].physicsImpostor = new BABYLON.PhysicsImpostor(_asset[1], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0.1, restitution: 0, friction: 0 }, scene);
-                    _asset[1].position = new BABYLON.Vector3(0, 0, -0.5);
+                    asset[1].physicsImpostor = null;
+                    asset[1] = newMeshes[0];
+                    asset[1].position = new BABYLON.Vector3(0, 0, -0.5);
+                    asset[1].physicsImpostor = new BABYLON.PhysicsImpostor(asset[1], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0.1, restitution: 0, friction: 0 }, scene);
+
+                    if (playerScore + gameAiScore >= 3) {
+                        judgement();
+                    }
                 }
-                else if (_asset[1].intersectsMesh(_asset[12], true)) {
+                else if (asset[1].intersectsMesh(asset[12], true)) {
 
                     console.log("Player +1");
                     playerScore++;
 
-                    _asset[1].physicsImpostor = null;
-                    _asset[1].physicsImpostor = new BABYLON.PhysicsImpostor(_asset[1], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0.1, restitution: 0, friction: 0 }, scene);
-                    _asset[1].position = new BABYLON.Vector3(0, 0, -0.5);
+                    asset[1].physicsImpostor = null;
+                    asset[1] = newMeshes[0];
+                    asset[1].position = new BABYLON.Vector3(0, 0, -0.5);
+                    asset[1].physicsImpostor = new BABYLON.PhysicsImpostor(asset[1], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0.1, restitution: 0, friction: 0 }, scene);
+
+                    if (playerScore + gameAiScore >= 3) {
+                        judgement();
+                    }
                 }
             }
 
             // パックの位置がテーブルの範囲を越えた場合
-            if(!(_asset[1].position.x >= -0.5 && _asset[1].position.x <= 0.5 && _asset[1].position.z >= -1.0 && _asset[1].position.z <= 1.0 && _asset[1].position.y >= -0.03 && _asset[1].position.y <= 0.03)) {
-                _asset[1].position = new BABYLON.Vector3(0, 0, -0.5);
+            if(!(asset[1].position.x >= -0.5 && asset[1].position.x <= 0.5) || !(asset[1].position.z >= -1.0 && asset[1].position.z <= 1.0) || !(asset[1].position.y >= -0.01 && asset[1].position.y <= 0.03)) {
+                asset[1].physicsImpostor = null;
+                asset[1] = newMeshes[0];
+                asset[1].position = new BABYLON.Vector3(0, 0, -0.5);
+                asset[1].physicsImpostor = new BABYLON.PhysicsImpostor(asset[1], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0.1, restitution: 0, friction: 0 }, scene);
+                console.log("The pack is out of range!");
             }
 
             // パックがゲームAI側で固まった場合
-            var pack1Pos1 = _asset[1].position;
+            var pack1Pos1 = asset[1].position;
             setTimeout(function(){
-                var pack1Pos2 = _asset[1].position;
+                var pack1Pos2 = asset[1].position;
                 if(pack1Pos2.z > 0 && distance(pack1Pos1, pack1Pos2) < 0.005) {
-                    _asset[1].position = new BABYLON.Vector3(0, 0, 0.5);
+                    asset[1].position = new BABYLON.Vector3(0, 0, 0.5);
                 }
             }, 3000);
         },100);
     });
 
     BABYLON.SceneLoader.ImportMesh("mallet", "./babylon_file/", "mallet.babylon", scene, function (newMeshes) {
-        _asset[2] = newMeshes[0];
-        _initAsset2Position(_asset);
-        _asset[2].physicsImpostor = new BABYLON.PhysicsImpostor(_asset[2], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 3, restitution: 0, friction: 10}, scene);
+        asset[2] = newMeshes[0];
+        _initAsset2Position(asset);
+        asset[2].physicsImpostor = new BABYLON.PhysicsImpostor(asset[2], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 3, restitution: 0, friction: 10}, scene);
         var playerPos = new BABYLON.Vector3(0.0, 0.0, -0.95);
         document.addEventListener('mousemove', function() {
             // マウススクリーン座標をワールド座標に変換し、平面ワールド座標に変換する
@@ -197,67 +211,66 @@ Game.prototype._initScene = function(engine, _asset, _this) {
             }
             
             
-            _asset[2].position = mousePos2;
+            asset[2].position = mousePos2;
             playerPos = mousePos2;
-            //_asset[2].rotation = BABYLON.Vector3.RotationFromAxis(0, 0, 0);
         }, false);
         
         setInterval(function(){
-            _asset[2].position = playerPos;
+            asset[2].position = playerPos;
         },1);
     });
 
     BABYLON.SceneLoader.ImportMesh("mallet2", "./babylon_file/", "mallet2.babylon", scene, function (newMeshes) {
-        _asset[3] = newMeshes[0];
-        _initAsset3Position(_asset);
+        asset[3] = newMeshes[0];
+        _initAsset3Position(asset);
         gameAiPos = new BABYLON.Vector3(0.0, 0.0, 0.95);
-        _asset[3].physicsImpostor = new BABYLON.PhysicsImpostor(_asset[3], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 3, restitution: 0, friction: 10 }, scene);
+        asset[3].physicsImpostor = new BABYLON.PhysicsImpostor(asset[3], BABYLON.PhysicsImpostor.BoxImpostor, { mass: 3, restitution: 0, friction: 10 }, scene);
 
         setInterval(function(){
-            _asset[3].position = gameAiPos;
+            asset[3].position = gameAiPos;
         },1);
         
         var exec_game_ai = false;
 
         // ゲームAI起動
-        run_game_ai = setInterval(game_ai, 200, exec_game_ai, _asset);
+        run_game_ai = setInterval(game_ai, 200, exec_game_ai);
     });
 
     return scene;
 };
 
 // ゲームAI実装部分
-function game_ai(exec_game_ai, _asset) {
-    if (_asset[1] != null && exec_game_ai == false) {
-        if (_asset[1].position.z > 0.08) {
+function game_ai(exec_game_ai) {
+    if (asset[1] != null && exec_game_ai == false) {
+        if (asset[1].position.z > 0.08) {
             exec_game_ai = true;
             clearInterval(run_game_ai);
 
-            var pack_pnt1 = _asset[1].position;
+            var pack_pnt1 = asset[1].position;
             var pack_pnt2;
             
             setTimeout(function(){
-                pack_pnt2 = _asset[1].position;
+                pack_pnt2 = asset[1].position;
                 
                 // （ほぼ）停止 OR 迫る OR 遠ざかる
                 if (distance(pack_pnt1, pack_pnt2) < 0.01) {// （ほぼ）停止
                     var new_pnt = pack_pnt2;
-                    //new_pnt.z += 0.02;
+                    
                     new_pnt = game_ai_mallet_point(new_pnt);
 
                     // 打点位置までマレットを移動
                     var move_game_ai_mallet_cnt = 0;
-                    var original_pos = _asset[3].position;
+                    var original_pos = asset[3].position;
                     var move_game_ai_mallet = setInterval(function(){
                         if (move_game_ai_mallet_cnt >= 6){
                             clearInterval(move_game_ai_mallet);
                             exec_game_ai = false;
-                            run_game_ai = setInterval(game_ai, 200, exec_game_ai, _asset);
+                            run_game_ai = setInterval(game_ai, 200, exec_game_ai, asset);
                         } else {
-                            var new_x = _asset[3].position.x + (new_pnt.x - original_pos.x) * 0.16;
-                            var new_z = _asset[3].position.z + (new_pnt.z - original_pos.z) * 0.16;
-                            _asset[3].position = new BABYLON.Vector3(new_x, 0.0, new_z);
-                            gameAiPos = _asset[3].position;
+                            var new_x = asset[3].position.x + (new_pnt.x - original_pos.x) * 0.16;
+                            var new_z = asset[3].position.z + (new_pnt.z - original_pos.z) * 0.16;
+                            asset[3].position = new BABYLON.Vector3(new_x, 0.0, new_z);
+                            gameAiPos = asset[3].position;
                             move_game_ai_mallet_cnt++;
                         }
                     }, 100);
@@ -281,40 +294,35 @@ function game_ai(exec_game_ai, _asset) {
                     
                     // 打点位置までマレットを移動
                     var move_game_ai_mallet_cnt = 0;
-                    var original_pos = _asset[3].position;
+                    var original_pos = asset[3].position;
                     var move_game_ai_mallet = setInterval(function(){
                         if (move_game_ai_mallet_cnt >= 6){
                             clearInterval(move_game_ai_mallet);
                             
                             exec_game_ai = false;
-                            run_game_ai = setInterval(game_ai, 200, exec_game_ai, _asset);
+                            run_game_ai = setInterval(game_ai, 200, exec_game_ai, asset);
                         } else {
-                            var new_x = _asset[3].position.x + (new_pnt.x - original_pos.x) * 0.16;
-                            var new_z = _asset[3].position.z + (new_pnt.z - original_pos.z) * 0.16;
-                            _asset[3].position = new BABYLON.Vector3(new_x, 0.0, new_z);
-                            gameAiPos = _asset[3].position;
+                            var new_x = asset[3].position.x + (new_pnt.x - original_pos.x) * 0.16;
+                            var new_z = asset[3].position.z + (new_pnt.z - original_pos.z) * 0.16;
+                            asset[3].position = new BABYLON.Vector3(new_x, 0.0, new_z);
+                            gameAiPos = asset[3].position;
                             move_game_ai_mallet_cnt++;
                         }
                     }, 100);
                 } else {// 遠ざかる
                     exec_game_ai = false;
-                    run_game_ai = setInterval(game_ai, 200, exec_game_ai, _asset);
+                    run_game_ai = setInterval(game_ai, 200, exec_game_ai, asset);
                 }
             }, 200);
         }
     }
 }
 
-var _initAsset2Position = function(_asset) {
-    _asset[2].position = new BABYLON.Vector3(0.0, 0.0, -0.95);
+var _initAsset2Position = function() {
+    asset[2].position = new BABYLON.Vector3(0.0, 0.0, -0.95);
 };
-var _initAsset3Position = function(_asset) {
-    _asset[3].position = new BABYLON.Vector3(0.0, 0.0, 0.95);// X 0.45
-};
-
-Game.prototype._initGame = function() {
-    playerScore = 0;
-    gameAiScore = 0;
+var _initAsset3Position = function() {
+    asset[3].position = new BABYLON.Vector3(0.0, 0.0, 0.95);// X 0.45
 };
 
 // 2点間の距離を返す
@@ -373,4 +381,28 @@ function intersection_point(p1, p2, p3, p4) {
     cp.z = (d1 * (p2.z - p1.z) - d2 * (p4.z - p3.z)) / d0;
 
     return cp;
+}
+
+// クリックしてゲーム開始
+function start(){
+    if (first_flag == true) {
+        first_flag = false;
+    } else {
+        playerScore = 0;
+        gameAiScore = 0;
+    }
+    $("#start_end_outer").hide();
+    $("#start_end_div").hide();
+}
+
+// 勝敗判定
+function judgement() {
+    if (playerScore > gameAiScore) {
+        $("#start_end_div").text("You Win! Click to Restart");
+    } else {
+        $("#start_end_div").text("You Lose! Click to Restart");
+    }
+
+    $("#start_end_outer").show();
+    $("#start_end_div").show();
 }
