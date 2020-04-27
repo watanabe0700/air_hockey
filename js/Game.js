@@ -20,6 +20,11 @@ var Game = function(canvasId) {
 
     this.scene = this._initScene(this.engine, this);
 
+    var bgm = new BABYLON.Sound("bgm", "./ogg/bgm.ogg", this.scene, null, {
+        loop: true,
+        autoplay: true
+      });
+
     //ダブルクリックしたら、パックの位置を初期化
     canvas.addEventListener('dblclick',function(e) {
         if (asset[1] != null) {
