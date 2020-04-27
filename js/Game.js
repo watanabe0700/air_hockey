@@ -12,6 +12,7 @@ var scoreboard_texture = null;
 var first_flag = true;
 
 asset = [null, null, null, null, null, null, null, null, null, null, null, null, null];
+var se = null;
 
 var Game = function(canvasId) {
     var canvas = document.getElementById(canvasId);
@@ -24,6 +25,9 @@ var Game = function(canvasId) {
         loop: true,
         autoplay: true
       });
+
+
+    se = new BABYLON.Sound("se", "./ogg/se.ogg", this.scene, null, {loop: false});
 
     //ダブルクリックしたら、パックの位置を初期化
     canvas.addEventListener('dblclick',function(e) {
@@ -143,6 +147,40 @@ Game.prototype._initScene = function(engine, _this) {
                     if (playerScore + gameAiScore >= 3) {
                         judgement();
                     }
+                }
+            }
+
+            if (asset[2] != null && asset[3] != null && asset[5] != null && asset[6] != null && asset[7] != null && asset[8] != null && asset[9] != null && asset[10] != null) {
+                if (asset[1].intersectsMesh(asset[2], true)) {
+                    se.play();
+                }
+                
+                if (asset[1].intersectsMesh(asset[3], true)) {
+                    se.play();
+                }
+
+                if (asset[1].intersectsMesh(asset[5], true)) {
+                    se.play();
+                }
+
+                if (asset[1].intersectsMesh(asset[6], true)) {
+                    se.play();
+                }
+
+                if (asset[1].intersectsMesh(asset[7], true)) {
+                    se.play();
+                }
+
+                if (asset[1].intersectsMesh(asset[8], true)) {
+                    se.play();
+                }
+
+                if (asset[1].intersectsMesh(asset[9], true)) {
+                    se.play();
+                }
+
+                if (asset[1].intersectsMesh(asset[10], true)) {
+                    se.play();
                 }
             }
 
